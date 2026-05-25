@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="sales_report"
+              pageWidth="842"
+              pageHeight="595"
+              orientation="Landscape"
+              columnWidth="782"
+              leftMargin="30"
+              rightMargin="30"
+              topMargin="20"
+              bottomMargin="20"
+              uuid="b2c3d4e5-f6a7-8901-bcde-f23456789012">
+
+  <parameter name="COMPANY_NAME"    class="java.lang.String"/>
+  <parameter name="COMPANY_NIF"     class="java.lang.String"/>
+  <parameter name="COMPANY_ADDRESS" class="java.lang.String"/>
+  <parameter name="REPORT_TITLE"    class="java.lang.String"/>
+  <parameter name="DATE_FROM"       class="java.lang.String"/>
+  <parameter name="DATE_TO"         class="java.lang.String"/>
+  <parameter name="TOTAL_RECORDS"   class="java.lang.Integer"/>
+  <parameter name="TOTAL_SUBTOTAL"  class="java.lang.String"/>
+  <parameter name="TOTAL_TAX"       class="java.lang.String"/>
+  <parameter name="TOTAL_AMOUNT"    class="java.lang.String"/>
+  <parameter name="TOTAL_PAID"      class="java.lang.String"/>
+  <parameter name="TOTAL_DUE"       class="java.lang.String"/>
+  <parameter name="GENERATED_AT"    class="java.lang.String"/>
+
+  <field name="fullNumber"   class="java.lang.String"/>
+  <field name="customerName" class="java.lang.String"/>
+  <field name="customerNif"  class="java.lang.String"/>
+  <field name="issueDate"    class="java.lang.String"/>
+  <field name="dueDate"      class="java.lang.String"/>
+  <field name="status"       class="java.lang.String"/>
+  <field name="subtotal"     class="java.lang.String"/>
+  <field name="taxAmount"    class="java.lang.String"/>
+  <field name="total"        class="java.lang.String"/>
+  <field name="amountPaid"   class="java.lang.String"/>
+  <field name="amountDue"    class="java.lang.String"/>
+
+  <style name="base"    isDefault="true" fontName="DejaVu Sans" fontSize="7" forecolor="#1a1a2e"/>
+  <style name="bold"    fontName="DejaVu Sans" fontSize="7" isBold="true"/>
+  <style name="header"  fontName="DejaVu Sans" fontSize="7" isBold="true" forecolor="#FFFFFF"/>
+  <style name="mono"    fontName="DejaVu Sans Mono" fontSize="7" forecolor="#1a56db"/>
+  <style name="title"   fontName="DejaVu Sans" fontSize="14" isBold="true" forecolor="#1a56db"/>
+
+  <title>
+    <band height="60">
+      <rectangle>
+        <reportElement x="0" y="0" width="782" height="5" backcolor="#1a56db" forecolor="#1a56db"/>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <textField>
+        <reportElement x="0" y="10" width="400" height="20" style="title"/>
+        <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="0" y="32" width="400" height="10" forecolor="#6b7280"/>
+        <textFieldExpression><![CDATA[$P{COMPANY_NAME} + " | NIF: " + $P{COMPANY_NIF}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="0" y="44" width="400" height="10" forecolor="#6b7280"/>
+        <textFieldExpression><![CDATA["Período: " + $P{DATE_FROM} + " a " + $P{DATE_TO} + "  |  Total: " + $P{TOTAL_RECORDS} + " documentos"]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="600" y="44" width="182" height="10" forecolor="#9ca3af"/>
+        <textElement textAlignment="Right"/>
+        <textFieldExpression><![CDATA["Gerado: " + $P{GENERATED_AT}]]></textFieldExpression>
+      </textField>
+    </band>
+  </title>
+
+  <columnHeader>
+    <band height="16">
+      <rectangle>
+        <reportElement x="0" y="0" width="782" height="16" backcolor="#1a56db" forecolor="#1a56db"/>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <staticText><reportElement x="2"   y="4" width="80"  height="8" style="header"/><text><![CDATA[Nº DOCUMENTO]]></text></staticText>
+      <staticText><reportElement x="82"  y="4" width="130" height="8" style="header"/><text><![CDATA[CLIENTE]]></text></staticText>
+      <staticText><reportElement x="212" y="4" width="60"  height="8" style="header"/><text><![CDATA[NIF CLIENTE]]></text></staticText>
+      <staticText><reportElement x="272" y="4" width="55"  height="8" style="header"/><text><![CDATA[EMISSÃO]]></text></staticText>
+      <staticText><reportElement x="327" y="4" width="55"  height="8" style="header"/><text><![CDATA[VENCIMENTO]]></text></staticText>
+      <staticText><reportElement x="382" y="4" width="60"  height="8" style="header"/><text><![CDATA[ESTADO]]></text></staticText>
+      <staticText><reportElement x="442" y="4" width="70"  height="8" style="header"/><textElement textAlignment="Right"/><text><![CDATA[SUBTOTAL]]></text></staticText>
+      <staticText><reportElement x="512" y="4" width="65"  height="8" style="header"/><textElement textAlignment="Right"/><text><![CDATA[IVA]]></text></staticText>
+      <staticText><reportElement x="577" y="4" width="75"  height="8" style="header"/><textElement textAlignment="Right"/><text><![CDATA[TOTAL]]></text></staticText>
+      <staticText><reportElement x="652" y="4" width="65"  height="8" style="header"/><textElement textAlignment="Right"/><text><![CDATA[PAGO]]></text></staticText>
+      <staticText><reportElement x="717" y="4" width="63"  height="8" style="header"/><textElement textAlignment="Right"/><text><![CDATA[EM DÍVIDA]]></text></staticText>
+    </band>
+  </columnHeader>
+
+  <detail>
+    <band height="13">
+      <rectangle>
+        <reportElement x="0" y="0" width="782" height="13" backcolor="#f9fafb" forecolor="#f9fafb">
+          <printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+        </reportElement>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <textField><reportElement x="2"   y="2" width="78"  height="9" style="mono"/><textFieldExpression><![CDATA[$F{fullNumber}]]></textFieldExpression></textField>
+      <textField><reportElement x="82"  y="2" width="128" height="9"/><textFieldExpression><![CDATA[$F{customerName}]]></textFieldExpression></textField>
+      <textField><reportElement x="212" y="2" width="58"  height="9" forecolor="#6b7280"/><textFieldExpression><![CDATA[$F{customerNif}]]></textFieldExpression></textField>
+      <textField><reportElement x="272" y="2" width="53"  height="9"/><textFieldExpression><![CDATA[$F{issueDate}]]></textFieldExpression></textField>
+      <textField><reportElement x="327" y="2" width="53"  height="9"/><textFieldExpression><![CDATA[$F{dueDate}.isEmpty() ? "—" : $F{dueDate}]]></textFieldExpression></textField>
+      <textField><reportElement x="382" y="2" width="58"  height="9" forecolor="#6b7280"/><textFieldExpression><![CDATA[$F{status}]]></textFieldExpression></textField>
+      <textField><reportElement x="442" y="2" width="68"  height="9"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression></textField>
+      <textField><reportElement x="512" y="2" width="63"  height="9"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{taxAmount}]]></textFieldExpression></textField>
+      <textField><reportElement x="577" y="2" width="73"  height="9" style="mono"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{total}]]></textFieldExpression></textField>
+      <textField><reportElement x="652" y="2" width="63"  height="9" forecolor="#16a34a"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{amountPaid}]]></textFieldExpression></textField>
+      <textField><reportElement x="717" y="2" width="63"  height="9" forecolor="#dc2626"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{amountDue}]]></textFieldExpression></textField>
+      <line><reportElement x="0" y="12" width="782" height="1" forecolor="#e5e7eb"/></line>
+    </band>
+  </detail>
+
+  <summary>
+    <band height="30">
+      <rectangle>
+        <reportElement x="0" y="0" width="782" height="22" backcolor="#1e293b" forecolor="#1e293b"/>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <staticText><reportElement x="2"   y="7" width="440" height="8" forecolor="#FFFFFF"/><textElement><font isBold="true"/></textElement><text><![CDATA[TOTAIS]]></text></staticText>
+      <textField><reportElement x="442" y="7" width="68"  height="8" forecolor="#FFFFFF"/><textElement textAlignment="Right"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_SUBTOTAL}]]></textFieldExpression></textField>
+      <textField><reportElement x="512" y="7" width="63"  height="8" forecolor="#FFFFFF"/><textElement textAlignment="Right"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_TAX}]]></textFieldExpression></textField>
+      <textField><reportElement x="577" y="7" width="73"  height="8" forecolor="#58a6ff"/><textElement textAlignment="Right"><font isBold="true" size="8"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_AMOUNT}]]></textFieldExpression></textField>
+      <textField><reportElement x="652" y="7" width="63"  height="8" forecolor="#4ade80"/><textElement textAlignment="Right"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_PAID}]]></textFieldExpression></textField>
+      <textField><reportElement x="717" y="7" width="63"  height="8" forecolor="#f87171"/><textElement textAlignment="Right"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_DUE}]]></textFieldExpression></textField>
+    </band>
+  </summary>
+
+</jasperReport>

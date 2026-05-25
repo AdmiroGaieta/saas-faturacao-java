@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="invoice"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="535"
+              leftMargin="30"
+              rightMargin="30"
+              topMargin="20"
+              bottomMargin="20"
+              uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
+
+  <!-- ── Parâmetros ─────────────────────────────────────────── -->
+  <parameter name="COMPANY_NAME"    class="java.lang.String"/>
+  <parameter name="COMPANY_NIF"     class="java.lang.String"/>
+  <parameter name="COMPANY_ADDRESS" class="java.lang.String"/>
+  <parameter name="COMPANY_PHONE"   class="java.lang.String"/>
+  <parameter name="COMPANY_EMAIL"   class="java.lang.String"/>
+  <parameter name="COMPANY_BANK"    class="java.lang.String"/>
+  <parameter name="COMPANY_ACCOUNT" class="java.lang.String"/>
+  <parameter name="COMPANY_IBAN"    class="java.lang.String"/>
+  <parameter name="DOC_TYPE"        class="java.lang.String"/>
+  <parameter name="DOC_NUMBER"      class="java.lang.String"/>
+  <parameter name="DOC_STATUS"      class="java.lang.String"/>
+  <parameter name="ISSUE_DATE"      class="java.lang.String"/>
+  <parameter name="DUE_DATE"        class="java.lang.String"/>
+  <parameter name="CURRENCY"        class="java.lang.String"/>
+  <parameter name="REFERENCE"       class="java.lang.String"/>
+  <parameter name="CUSTOMER_NAME"   class="java.lang.String"/>
+  <parameter name="CUSTOMER_NIF"    class="java.lang.String"/>
+  <parameter name="CUSTOMER_ADDRESS" class="java.lang.String"/>
+  <parameter name="CUSTOMER_EMAIL"  class="java.lang.String"/>
+  <parameter name="CUSTOMER_PHONE"  class="java.lang.String"/>
+  <parameter name="SUBTOTAL"        class="java.lang.String"/>
+  <parameter name="DISCOUNT"        class="java.lang.String"/>
+  <parameter name="TAX_AMOUNT"      class="java.lang.String"/>
+  <parameter name="TOTAL"           class="java.lang.String"/>
+  <parameter name="AMOUNT_PAID"     class="java.lang.String"/>
+  <parameter name="AMOUNT_DUE"      class="java.lang.String"/>
+  <parameter name="NOTES"           class="java.lang.String"/>
+  <parameter name="TERMS"           class="java.lang.String"/>
+  <parameter name="AGT_HASH"        class="java.lang.String"/>
+  <parameter name="GENERATED_AT"    class="java.lang.String"/>
+
+  <!-- ── Campos do datasource (linhas da factura) ───────────── -->
+  <field name="description" class="java.lang.String"/>
+  <field name="quantity"    class="java.lang.String"/>
+  <field name="unit"        class="java.lang.String"/>
+  <field name="unitPrice"   class="java.lang.String"/>
+  <field name="discountPct" class="java.lang.String"/>
+  <field name="taxRate"     class="java.lang.String"/>
+  <field name="subtotal"    class="java.lang.String"/>
+  <field name="total"       class="java.lang.String"/>
+
+  <!-- ── Estilos ────────────────────────────────────────────── -->
+  <style name="baseStyle"  isDefault="true" fontName="DejaVu Sans" fontSize="8"  forecolor="#1a1a2e"/>
+  <style name="headerBold"                   fontName="DejaVu Sans" fontSize="9"  isBold="true" forecolor="#FFFFFF"/>
+  <style name="title"                        fontName="DejaVu Sans" fontSize="18" isBold="true" forecolor="#1a56db"/>
+  <style name="section"                      fontName="DejaVu Sans" fontSize="7"  isBold="true" forecolor="#6b7280" isUpperCase="true"/>
+  <style name="mono"                         fontName="DejaVu Sans Mono" fontSize="8" forecolor="#1a56db"/>
+  <style name="totalLabel"                   fontName="DejaVu Sans" fontSize="9"  isBold="true"/>
+  <style name="totalValue"                   fontName="DejaVu Sans Mono" fontSize="10" isBold="true" forecolor="#1a56db"/>
+  <style name="tableHeader"                  fontName="DejaVu Sans" fontSize="7"  isBold="true" forecolor="#FFFFFF"/>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CABEÇALHO DA PÁGINA                                      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <pageHeader>
+    <band height="140">
+
+      <!-- Faixa azul superior -->
+      <rectangle>
+        <reportElement x="0" y="0" width="535" height="6" backcolor="#1a56db" forecolor="#1a56db"/>
+        <graphicElement>
+          <pen lineWidth="0"/>
+        </graphicElement>
+      </rectangle>
+
+      <!-- Nome da empresa -->
+      <textField>
+        <reportElement x="0" y="14" width="280" height="22" style="title"/>
+        <textElement verticalAlignment="Middle"/>
+        <textFieldExpression><![CDATA[$P{COMPANY_NAME}]]></textFieldExpression>
+      </textField>
+
+      <!-- NIF da empresa -->
+      <staticText>
+        <reportElement x="0" y="38" width="60" height="10" style="section"/>
+        <text><![CDATA[NIF:]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="60" y="38" width="220" height="10" style="mono"/>
+        <textFieldExpression><![CDATA[$P{COMPANY_NIF}]]></textFieldExpression>
+      </textField>
+
+      <!-- Endereço e contactos da empresa (direita) -->
+      <textField isStretchWithOverflow="true">
+        <reportElement x="320" y="14" width="215" height="40" forecolor="#6b7280"/>
+        <textElement textAlignment="Right">
+          <font size="7"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$P{COMPANY_ADDRESS} +
+          ($P{COMPANY_PHONE}.isEmpty() ? "" : "\nTel: " + $P{COMPANY_PHONE}) +
+          ($P{COMPANY_EMAIL}.isEmpty() ? "" : "\n" + $P{COMPANY_EMAIL})]]></textFieldExpression>
+      </textField>
+
+      <!-- Linha separadora -->
+      <line>
+        <reportElement x="0" y="58" width="535" height="1" forecolor="#e5e7eb"/>
+      </line>
+
+      <!-- Tipo do documento (grande, à esquerda) -->
+      <textField>
+        <reportElement x="0" y="66" width="280" height="28" forecolor="#111827"/>
+        <textElement>
+          <font size="20" isBold="true"/>
+        </textElement>
+        <textFieldExpression><![CDATA[$P{DOC_TYPE}.toUpperCase()]]></textFieldExpression>
+      </textField>
+
+      <!-- Número do documento -->
+      <textField>
+        <reportElement x="0" y="96" width="200" height="12" style="mono"/>
+        <textFieldExpression><![CDATA[$P{DOC_NUMBER}]]></textFieldExpression>
+      </textField>
+
+      <!-- Metadados (direita) -->
+      <staticText>
+        <reportElement x="330" y="66" width="100" height="10" style="section"/>
+        <textElement textAlignment="Right"/>
+        <text><![CDATA[DATA DE EMISSÃO]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="430" y="66" width="105" height="10"/>
+        <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+        <textFieldExpression><![CDATA[$P{ISSUE_DATE}]]></textFieldExpression>
+      </textField>
+
+      <staticText>
+        <reportElement x="330" y="80" width="100" height="10" style="section"/>
+        <textElement textAlignment="Right"/>
+        <text><![CDATA[DATA DE VENCIMENTO]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="430" y="80" width="105" height="10"/>
+        <textElement textAlignment="Right"><font size="8"/></textElement>
+        <textFieldExpression><![CDATA[$P{DUE_DATE}.isEmpty() ? "—" : $P{DUE_DATE}]]></textFieldExpression>
+      </textField>
+
+      <staticText>
+        <reportElement x="330" y="94" width="100" height="10" style="section"/>
+        <textElement textAlignment="Right"/>
+        <text><![CDATA[REFERÊNCIA]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="430" y="94" width="105" height="10"/>
+        <textElement textAlignment="Right"><font size="8"/></textElement>
+        <textFieldExpression><![CDATA[$P{REFERENCE}.isEmpty() ? "—" : $P{REFERENCE}]]></textFieldExpression>
+      </textField>
+
+      <!-- Caixa do cliente -->
+      <rectangle>
+        <reportElement x="0" y="112" width="280" height="28" backcolor="#f3f4f6" forecolor="#f3f4f6"/>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <staticText>
+        <reportElement x="6" y="114" width="270" height="8" style="section"/>
+        <text><![CDATA[FACTURADO A]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="6" y="123" width="270" height="10"/>
+        <textElement><font size="9" isBold="true"/></textElement>
+        <textFieldExpression><![CDATA[$P{CUSTOMER_NAME}]]></textFieldExpression>
+      </textField>
+      <textField isStretchWithOverflow="true">
+        <reportElement x="6" y="134" width="180" height="8" forecolor="#6b7280"/>
+        <textFieldExpression><![CDATA[($P{CUSTOMER_NIF}.isEmpty() ? "" : "NIF: " + $P{CUSTOMER_NIF} + "  ") +
+          ($P{CUSTOMER_EMAIL}.isEmpty() ? "" : $P{CUSTOMER_EMAIL})]]></textFieldExpression>
+      </textField>
+
+    </band>
+  </pageHeader>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CABEÇALHO DA TABELA DE ITENS                             -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <columnHeader>
+    <band height="18">
+      <rectangle>
+        <reportElement x="0" y="0" width="535" height="18" backcolor="#1a56db" forecolor="#1a56db"/>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <staticText>
+        <reportElement x="4"   y="4" width="200" height="10" style="tableHeader"/>
+        <text><![CDATA[DESCRIÇÃO]]></text>
+      </staticText>
+      <staticText>
+        <reportElement x="204" y="4" width="40"  height="10" style="tableHeader"/>
+        <textElement textAlignment="Center"/>
+        <text><![CDATA[QTD]]></text>
+      </staticText>
+      <staticText>
+        <reportElement x="244" y="4" width="30"  height="10" style="tableHeader"/>
+        <textElement textAlignment="Center"/>
+        <text><![CDATA[UN.]]></text>
+      </staticText>
+      <staticText>
+        <reportElement x="274" y="4" width="70"  height="10" style="tableHeader"/>
+        <textElement textAlignment="Right"/>
+        <text><![CDATA[PREÇO UNIT.]]></text>
+      </staticText>
+      <staticText>
+        <reportElement x="344" y="4" width="40"  height="10" style="tableHeader"/>
+        <textElement textAlignment="Center"/>
+        <text><![CDATA[DESC.%]]></text>
+      </staticText>
+      <staticText>
+        <reportElement x="384" y="4" width="35"  height="10" style="tableHeader"/>
+        <textElement textAlignment="Center"/>
+        <text><![CDATA[IVA%]]></text>
+      </staticText>
+      <staticText>
+        <reportElement x="419" y="4" width="112" height="10" style="tableHeader"/>
+        <textElement textAlignment="Right"/>
+        <text><![CDATA[TOTAL]]></text>
+      </staticText>
+    </band>
+  </columnHeader>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- DETALHE — LINHAS DA FACTURA                              -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <detail>
+    <band height="16" splitType="Stretch">
+
+      <!-- Fundo alternado -->
+      <rectangle>
+        <reportElement x="0" y="0" width="535" height="16" backcolor="#f9fafb" forecolor="#f9fafb"
+                       isPrintWhenDetailOverflows="true">
+          <printWhenExpression><![CDATA[$V{REPORT_COUNT} % 2 == 0]]></printWhenExpression>
+        </reportElement>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+
+      <textField isStretchWithOverflow="true">
+        <reportElement x="4"   y="3" width="198" height="10"/>
+        <textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="204" y="3" width="38"  height="10"/>
+        <textElement textAlignment="Center"/>
+        <textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="244" y="3" width="28"  height="10" forecolor="#6b7280"/>
+        <textElement textAlignment="Center"/>
+        <textFieldExpression><![CDATA[$F{unit}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="274" y="3" width="68"  height="10" style="mono"/>
+        <textElement textAlignment="Right"/>
+        <textFieldExpression><![CDATA[$F{unitPrice}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="344" y="3" width="38"  height="10" forecolor="#d29922"/>
+        <textElement textAlignment="Center"/>
+        <textFieldExpression><![CDATA[$F{discountPct}.isEmpty() ? "—" : $F{discountPct}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="384" y="3" width="33"  height="10" forecolor="#6b7280"/>
+        <textElement textAlignment="Center"/>
+        <textFieldExpression><![CDATA[$F{taxRate}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement x="419" y="3" width="112" height="10" style="mono"/>
+        <textElement textAlignment="Right"/>
+        <textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+      </textField>
+
+      <!-- Linha separadora -->
+      <line>
+        <reportElement x="0" y="15" width="535" height="1" forecolor="#e5e7eb"/>
+      </line>
+
+    </band>
+  </detail>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SUMÁRIO — TOTAIS + NOTAS + RODAPÉ                        -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <summary>
+    <band height="200" splitType="Stretch">
+
+      <!-- Totais (direita) -->
+      <line>
+        <reportElement x="300" y="10" width="235" height="1" forecolor="#e5e7eb"/>
+      </line>
+
+      <!-- Subtotal -->
+      <staticText>
+        <reportElement x="300" y="16" width="140" height="12"/>
+        <textElement textAlignment="Right"><font size="8"/></textElement>
+        <text><![CDATA[Subtotal:]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="440" y="16" width="95" height="12" style="mono"/>
+        <textElement textAlignment="Right"/>
+        <textFieldExpression><![CDATA[$P{SUBTOTAL}]]></textFieldExpression>
+      </textField>
+
+      <!-- IVA -->
+      <staticText>
+        <reportElement x="300" y="30" width="140" height="12"/>
+        <textElement textAlignment="Right"><font size="8"/></textElement>
+        <text><![CDATA[IVA:]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="440" y="30" width="95" height="12" style="mono"/>
+        <textElement textAlignment="Right"/>
+        <textFieldExpression><![CDATA[$P{TAX_AMOUNT}]]></textFieldExpression>
+      </textField>
+
+      <!-- Linha total -->
+      <line>
+        <reportElement x="300" y="44" width="235" height="1" forecolor="#1a56db"/>
+      </line>
+
+      <!-- TOTAL -->
+      <staticText>
+        <reportElement x="300" y="48" width="140" height="14" style="totalLabel"/>
+        <textElement textAlignment="Right"/>
+        <text><![CDATA[TOTAL A PAGAR:]]></text>
+      </staticText>
+      <textField>
+        <reportElement x="420" y="48" width="115" height="14" style="totalValue"/>
+        <textElement textAlignment="Right"/>
+        <textFieldExpression><![CDATA[$P{TOTAL}]]></textFieldExpression>
+      </textField>
+
+      <!-- Pago / Em dívida (se aplicável) -->
+      <textField>
+        <reportElement x="300" y="66" width="235" height="12" forecolor="#16a34a">
+          <printWhenExpression><![CDATA[!$P{AMOUNT_PAID}.equals("0,00 AOA")]]></printWhenExpression>
+        </reportElement>
+        <textElement textAlignment="Right"><font size="8"/></textElement>
+        <textFieldExpression><![CDATA["Pago: " + $P{AMOUNT_PAID}]]></textFieldExpression>
+      </textField>
+
+      <textField>
+        <reportElement x="300" y="80" width="235" height="12" forecolor="#dc2626">
+          <printWhenExpression><![CDATA[!$P{AMOUNT_DUE}.equals("0,00 AOA")]]></printWhenExpression>
+        </reportElement>
+        <textElement textAlignment="Right"><font size="8" isBold="true"/></textElement>
+        <textFieldExpression><![CDATA["Em dívida: " + $P{AMOUNT_DUE}]]></textFieldExpression>
+      </textField>
+
+      <!-- Dados bancários (esquerda) -->
+      <staticText>
+        <reportElement x="0" y="16" width="270" height="8" style="section">
+          <printWhenExpression><![CDATA[!$P{COMPANY_BANK}.isEmpty()]]></printWhenExpression>
+        </reportElement>
+        <text><![CDATA[DADOS PARA PAGAMENTO]]></text>
+      </staticText>
+      <textField isStretchWithOverflow="true">
+        <reportElement x="0" y="26" width="270" height="30">
+          <printWhenExpression><![CDATA[!$P{COMPANY_BANK}.isEmpty()]]></printWhenExpression>
+        </reportElement>
+        <textFieldExpression><![CDATA[($P{COMPANY_BANK}.isEmpty() ? "" : "Banco: " + $P{COMPANY_BANK} + "\n") +
+          ($P{COMPANY_ACCOUNT}.isEmpty() ? "" : "Conta: " + $P{COMPANY_ACCOUNT} + "\n") +
+          ($P{COMPANY_IBAN}.isEmpty() ? "" : "IBAN: " + $P{COMPANY_IBAN})]]></textFieldExpression>
+      </textField>
+
+      <!-- Notas -->
+      <staticText>
+        <reportElement x="0" y="100" width="200" height="8" style="section">
+          <printWhenExpression><![CDATA[!$P{NOTES}.isEmpty()]]></printWhenExpression>
+        </reportElement>
+        <text><![CDATA[NOTAS]]></text>
+      </staticText>
+      <textField isStretchWithOverflow="true">
+        <reportElement x="0" y="110" width="535" height="20">
+          <printWhenExpression><![CDATA[!$P{NOTES}.isEmpty()]]></printWhenExpression>
+        </reportElement>
+        <textFieldExpression><![CDATA[$P{NOTES}]]></textFieldExpression>
+      </textField>
+
+      <!-- Hash AGT -->
+      <textField>
+        <reportElement x="0" y="140" width="535" height="8" forecolor="#9ca3af">
+          <printWhenExpression><![CDATA[!$P{AGT_HASH}.isEmpty()]]></printWhenExpression>
+        </reportElement>
+        <textFieldExpression><![CDATA["Hash AGT: " + $P{AGT_HASH}]]></textFieldExpression>
+      </textField>
+
+      <!-- Rodapé -->
+      <line>
+        <reportElement x="0" y="158" width="535" height="1" forecolor="#e5e7eb"/>
+      </line>
+      <rectangle>
+        <reportElement x="0" y="160" width="535" height="20" backcolor="#f3f4f6" forecolor="#f3f4f6"/>
+        <graphicElement><pen lineWidth="0"/></graphicElement>
+      </rectangle>
+      <textField>
+        <reportElement x="0" y="165" width="535" height="10" forecolor="#9ca3af"/>
+        <textElement textAlignment="Center"><font size="7"/></textElement>
+        <textFieldExpression><![CDATA[$P{COMPANY_NAME} + " | NIF: " + $P{COMPANY_NIF} +
+          " | Documento processado por computador | Gerado em: " + $P{GENERATED_AT}]]></textFieldExpression>
+      </textField>
+
+    </band>
+  </summary>
+
+</jasperReport>
