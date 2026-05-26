@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="profit_loss" pageWidth="595" pageHeight="842"
+              columnWidth="535" leftMargin="30" rightMargin="30"
+              topMargin="20" bottomMargin="20"
+              uuid="a1b2c3d4-e5f6-7890-abcd-111222333444">
+
+  <parameter name="COMPANY_NAME"    class="java.lang.String"/>
+  <parameter name="COMPANY_NIF"     class="java.lang.String"/>
+  <parameter name="PERIOD"          class="java.lang.String"/>
+  <parameter name="TOTAL_REVENUE"   class="java.lang.String"/>
+  <parameter name="TOTAL_EXPENSES"  class="java.lang.String"/>
+  <parameter name="GROSS_PROFIT"    class="java.lang.String"/>
+  <parameter name="TOTAL_PAYROLL"   class="java.lang.String"/>
+  <parameter name="NET_PROFIT"      class="java.lang.String"/>
+  <parameter name="PROFIT_MARGIN"   class="java.lang.String"/>
+  <parameter name="GENERATED_AT"    class="java.lang.String"/>
+
+  <field name="category"   class="java.lang.String"/>
+  <field name="amount"     class="java.lang.String"/>
+  <field name="percentage" class="java.lang.String"/>
+  <field name="type"       class="java.lang.String"/>
+
+  <style name="base"    isDefault="true" fontName="DejaVu Sans" fontSize="9"/>
+  <style name="title"   fontName="DejaVu Sans" fontSize="16" isBold="true" forecolor="#1a56db"/>
+  <style name="section" fontName="DejaVu Sans" fontSize="8" isBold="true" forecolor="#6b7280" isUpperCase="true"/>
+  <style name="income"  fontName="DejaVu Sans Mono" fontSize="9" forecolor="#16a34a"/>
+  <style name="expense" fontName="DejaVu Sans Mono" fontSize="9" forecolor="#dc2626"/>
+  <style name="mono"    fontName="DejaVu Sans Mono" fontSize="9" forecolor="#1a56db"/>
+  <style name="hdr"     fontName="DejaVu Sans" fontSize="8" isBold="true" forecolor="#FFFFFF"/>
+
+  <title>
+    <band height="80">
+      <rectangle><reportElement x="0" y="0" width="535" height="6" backcolor="#1a56db" forecolor="#1a56db"/><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <staticText><reportElement x="0" y="14" width="535" height="24" style="title"/><textElement textAlignment="Center"/><text><![CDATA[DEMONSTRAÇÃO DE RESULTADOS]]></text></staticText>
+      <textField><reportElement x="0" y="42" width="535" height="12" forecolor="#374151"/><textElement textAlignment="Center"><font size="10" isBold="true"/></textElement><textFieldExpression><![CDATA[$P{COMPANY_NAME} + "  |  NIF: " + $P{COMPANY_NIF}]]></textFieldExpression></textField>
+      <textField><reportElement x="0" y="56" width="535" height="10" forecolor="#6b7280"/><textElement textAlignment="Center"/><textFieldExpression><![CDATA["Período: " + $P{PERIOD}]]></textFieldExpression></textField>
+      <textField><reportElement x="0" y="68" width="535" height="10" forecolor="#9ca3af"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA["Gerado: " + $P{GENERATED_AT}]]></textFieldExpression></textField>
+    </band>
+  </title>
+
+  <columnHeader>
+    <band height="18">
+      <rectangle><reportElement x="0" y="0" width="535" height="18" backcolor="#1a56db" forecolor="#1a56db"/><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <staticText><reportElement x="6"   y="5" width="280" height="8" style="hdr"/><text><![CDATA[RUBRICA]]></text></staticText>
+      <staticText><reportElement x="286" y="5" width="120" height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[VALOR (AOA)]]></text></staticText>
+      <staticText><reportElement x="406" y="5" width="123" height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[% RECEITA]]></text></staticText>
+    </band>
+  </columnHeader>
+
+  <detail>
+    <band height="18">
+      <rectangle><reportElement x="0" y="0" width="535" height="18" backcolor="#f9fafb" forecolor="#f9fafb"><printWhenExpression><![CDATA[$V{REPORT_COUNT}%2==0]]></printWhenExpression></reportElement><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <textField><reportElement x="6"   y="4" width="278" height="10"/><textFieldExpression><![CDATA[$F{category}]]></textFieldExpression></textField>
+      <textField><reportElement x="286" y="4" width="118" height="10"><printWhenExpression><![CDATA["INCOME".equals($F{type})]]></printWhenExpression></reportElement><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression></textField>
+      <textField><reportElement x="286" y="4" width="118" height="10" forecolor="#dc2626"><printWhenExpression><![CDATA["EXPENSE".equals($F{type})]]></printWhenExpression></reportElement><textElement textAlignment="Right"/><textFieldExpression><![CDATA["(" + $F{amount} + ")"]]></textFieldExpression></textField>
+      <textField><reportElement x="406" y="4" width="123" height="10" forecolor="#6b7280"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{percentage}]]></textFieldExpression></textField>
+      <line><reportElement x="0" y="17" width="535" height="1" forecolor="#e5e7eb"/></line>
+    </band>
+  </detail>
+
+  <summary>
+    <band height="180">
+      <!-- Linha de totais -->
+      <rectangle><reportElement x="0" y="10" width="535" height="1" forecolor="#374151" backcolor="#374151"/></rectangle>
+
+      <!-- Receita total -->
+      <staticText><reportElement x="6" y="18" width="280" height="12"/><textElement><font isBold="true" size="10"/></textElement><text><![CDATA[RECEITA TOTAL]]></text></staticText>
+      <textField><reportElement x="286" y="18" width="118" height="12" forecolor="#16a34a"/><textElement textAlignment="Right"><font isBold="true" size="10" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_REVENUE}]]></textFieldExpression></textField>
+
+      <!-- Despesas operacionais -->
+      <staticText><reportElement x="6" y="36" width="280" height="12"/><textElement><font isBold="true" size="10"/></textElement><text><![CDATA[DESPESAS OPERACIONAIS]]></text></staticText>
+      <textField><reportElement x="286" y="36" width="118" height="12" forecolor="#dc2626"/><textElement textAlignment="Right"><font isBold="true" size="10" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA["(" + $P{TOTAL_EXPENSES} + ")"]]></textFieldExpression></textField>
+
+      <!-- Folha de pagamento -->
+      <staticText><reportElement x="6" y="52" width="280" height="12"/><textElement><font isBold="true" size="10"/></textElement><text><![CDATA[ENCARGOS COM PESSOAL]]></text></staticText>
+      <textField><reportElement x="286" y="52" width="118" height="12" forecolor="#dc2626"/><textElement textAlignment="Right"><font isBold="true" size="10" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA["(" + $P{TOTAL_PAYROLL} + ")"]]></textFieldExpression></textField>
+
+      <!-- Lucro líquido -->
+      <rectangle><reportElement x="0" y="72" width="535" height="36" backcolor="#1a56db" forecolor="#1a56db"/><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <staticText><reportElement x="10" y="82" width="280" height="16" forecolor="#FFFFFF"/><textElement><font isBold="true" size="12"/></textElement><text><![CDATA[RESULTADO LÍQUIDO]]></text></staticText>
+      <textField><reportElement x="290" y="80" width="235" height="20" forecolor="#FFFFFF"/><textElement textAlignment="Right"><font isBold="true" size="14" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{NET_PROFIT}]]></textFieldExpression></textField>
+
+      <!-- Margem -->
+      <textField><reportElement x="0" y="116" width="535" height="12" forecolor="#6b7280"/><textElement textAlignment="Center"/><textFieldExpression><![CDATA["Margem Líquida: " + $P{PROFIT_MARGIN}]]></textFieldExpression></textField>
+    </band>
+  </summary>
+
+</jasperReport>

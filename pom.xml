@@ -114,12 +114,7 @@
       <artifactId>jasperreports-fonts</artifactId>
       <version>${jasperreports.version}</version>
     </dependency>
-    <!-- JasperReports PDF export via OpenPDF -->
-    <dependency>
-      <groupId>net.sf.jasperreports</groupId>
-      <artifactId>jasperreports-pdf</artifactId>
-      <version>${jasperreports.version}</version>
-    </dependency>
+    <!-- PDF export (6.x): incluído em jasperreports + OpenPDF abaixo -->
 
     <!-- ── Lombok ────────────────────────────────────────────── -->
     <dependency>

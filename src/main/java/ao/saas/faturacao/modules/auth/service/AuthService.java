@@ -1,7 +1,12 @@
 package ao.saas.faturacao.modules.auth.service;
 
 import ao.saas.faturacao.common.exceptions.BusinessException;
-import ao.saas.faturacao.modules.auth.dto.AuthDTOs.*;
+import ao.saas.faturacao.modules.auth.dto.AuthResponse;
+import ao.saas.faturacao.modules.auth.dto.ChangePasswordRequest;
+import ao.saas.faturacao.modules.auth.dto.CompanyInfo;
+import ao.saas.faturacao.modules.auth.dto.LoginRequest;
+import ao.saas.faturacao.modules.auth.dto.RegisterRequest;
+import ao.saas.faturacao.modules.auth.dto.UserDTO;
 import ao.saas.faturacao.modules.companies.entity.CompanyUser;
 import ao.saas.faturacao.modules.companies.repository.CompanyUserRepository;
 import ao.saas.faturacao.modules.users.entity.User;

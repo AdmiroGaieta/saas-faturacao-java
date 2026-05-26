@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+              http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="payroll_summary" pageWidth="842" pageHeight="595"
+              orientation="Landscape" columnWidth="782"
+              leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20"
+              uuid="f6a7b8c9-d0e1-2345-fabc-678901234567">
+
+  <parameter name="COMPANY_NAME"    class="java.lang.String"/>
+  <parameter name="COMPANY_NIF"     class="java.lang.String"/>
+  <parameter name="PERIOD"          class="java.lang.String"/>
+  <parameter name="TOTAL_EMPLOYEES" class="java.lang.Integer"/>
+  <parameter name="TOTAL_GROSS"     class="java.lang.String"/>
+  <parameter name="TOTAL_INSS_EMP"  class="java.lang.String"/>
+  <parameter name="TOTAL_INSS_EMP2" class="java.lang.String"/>
+  <parameter name="TOTAL_IRT"       class="java.lang.String"/>
+  <parameter name="TOTAL_DED"       class="java.lang.String"/>
+  <parameter name="TOTAL_NET"       class="java.lang.String"/>
+  <parameter name="GENERATED_AT"    class="java.lang.String"/>
+
+  <field name="employeeNumber"  class="java.lang.String"/>
+  <field name="employeeName"    class="java.lang.String"/>
+  <field name="department"      class="java.lang.String"/>
+  <field name="position"        class="java.lang.String"/>
+  <field name="baseSalary"      class="java.lang.String"/>
+  <field name="totalAllowances" class="java.lang.String"/>
+  <field name="grossSalary"     class="java.lang.String"/>
+  <field name="inssEmployee"    class="java.lang.String"/>
+  <field name="irtAmount"       class="java.lang.String"/>
+  <field name="totalDeductions" class="java.lang.String"/>
+  <field name="netSalary"       class="java.lang.String"/>
+  <field name="status"          class="java.lang.String"/>
+
+  <style name="base"   isDefault="true" fontName="DejaVu Sans" fontSize="7" forecolor="#1a1a2e"/>
+  <style name="bold"   fontName="DejaVu Sans" fontSize="7" isBold="true"/>
+  <style name="hdr"    fontName="DejaVu Sans" fontSize="7" isBold="true" forecolor="#FFFFFF"/>
+  <style name="mono"   fontName="DejaVu Sans Mono" fontSize="7" forecolor="#1a56db"/>
+  <style name="title"  fontName="DejaVu Sans" fontSize="14" isBold="true" forecolor="#1a56db"/>
+  <style name="danger" fontName="DejaVu Sans Mono" fontSize="7" forecolor="#dc2626"/>
+
+  <title>
+    <band height="55">
+      <rectangle><reportElement x="0" y="0" width="782" height="5" backcolor="#1a56db" forecolor="#1a56db"/><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <textField><reportElement x="0" y="10" width="500" height="20" style="title"/><textFieldExpression><![CDATA["FOLHA DE PAGAMENTO — " + $P{PERIOD}]]></textFieldExpression></textField>
+      <textField><reportElement x="0" y="34" width="400" height="10" forecolor="#374151"/><textElement><font size="9" isBold="true"/></textElement><textFieldExpression><![CDATA[$P{COMPANY_NAME} + "  |  NIF: " + $P{COMPANY_NIF}]]></textFieldExpression></textField>
+      <textField><reportElement x="0" y="46" width="400" height="8" forecolor="#6b7280"/><textFieldExpression><![CDATA["Total de Colaboradores: " + $P{TOTAL_EMPLOYEES} + "  |  Gerado em: " + $P{GENERATED_AT}]]></textFieldExpression></textField>
+    </band>
+  </title>
+
+  <columnHeader>
+    <band height="18">
+      <rectangle><reportElement x="0" y="0" width="782" height="18" backcolor="#1a56db" forecolor="#1a56db"/><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <staticText><reportElement x="2"   y="5" width="30"  height="8" style="hdr"/><text><![CDATA[Nº]]></text></staticText>
+      <staticText><reportElement x="32"  y="5" width="120" height="8" style="hdr"/><text><![CDATA[COLABORADOR]]></text></staticText>
+      <staticText><reportElement x="152" y="5" width="80"  height="8" style="hdr"/><text><![CDATA[DEPARTAMENTO]]></text></staticText>
+      <staticText><reportElement x="232" y="5" width="80"  height="8" style="hdr"/><text><![CDATA[CARGO]]></text></staticText>
+      <staticText><reportElement x="312" y="5" width="75"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[S. BASE]]></text></staticText>
+      <staticText><reportElement x="387" y="5" width="65"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[ABONOS]]></text></staticText>
+      <staticText><reportElement x="452" y="5" width="75"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[S. BRUTO]]></text></staticText>
+      <staticText><reportElement x="527" y="5" width="60"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[INSS (3%)]]></text></staticText>
+      <staticText><reportElement x="587" y="5" width="60"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[IRT]]></text></staticText>
+      <staticText><reportElement x="647" y="5" width="60"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[TOTAL DESC.]]></text></staticText>
+      <staticText><reportElement x="707" y="5" width="73"  height="8" style="hdr"/><textElement textAlignment="Right"/><text><![CDATA[S. LÍQUIDO]]></text></staticText>
+    </band>
+  </columnHeader>
+
+  <detail>
+    <band height="14">
+      <rectangle><reportElement x="0" y="0" width="782" height="14" backcolor="#f9fafb" forecolor="#f9fafb"><printWhenExpression><![CDATA[$V{REPORT_COUNT}%2==0]]></printWhenExpression></reportElement><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <textField><reportElement x="2"   y="2" width="28"  height="10" forecolor="#6b7280"/><textFieldExpression><![CDATA[$F{employeeNumber}]]></textFieldExpression></textField>
+      <textField><reportElement x="32"  y="2" width="118" height="10"/><textElement><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{employeeName}]]></textFieldExpression></textField>
+      <textField><reportElement x="152" y="2" width="78"  height="10" forecolor="#6b7280"/><textFieldExpression><![CDATA[$F{department}]]></textFieldExpression></textField>
+      <textField><reportElement x="232" y="2" width="78"  height="10" forecolor="#6b7280"/><textFieldExpression><![CDATA[$F{position}]]></textFieldExpression></textField>
+      <textField><reportElement x="312" y="2" width="73"  height="10" style="mono"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{baseSalary}]]></textFieldExpression></textField>
+      <textField><reportElement x="387" y="2" width="63"  height="10" style="mono"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{totalAllowances}]]></textFieldExpression></textField>
+      <textField><reportElement x="452" y="2" width="73"  height="10" style="mono"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{grossSalary}]]></textFieldExpression></textField>
+      <textField><reportElement x="527" y="2" width="58"  height="10" style="danger"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{inssEmployee}]]></textFieldExpression></textField>
+      <textField><reportElement x="587" y="2" width="58"  height="10" style="danger"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{irtAmount}]]></textFieldExpression></textField>
+      <textField><reportElement x="647" y="2" width="58"  height="10" style="danger"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA[$F{totalDeductions}]]></textFieldExpression></textField>
+      <textField><reportElement x="707" y="2" width="73"  height="10" style="mono"/><textElement textAlignment="Right"><font isBold="true"/></textElement><textFieldExpression><![CDATA[$F{netSalary}]]></textFieldExpression></textField>
+      <line><reportElement x="0" y="13" width="782" height="1" forecolor="#e5e7eb"/></line>
+    </band>
+  </detail>
+
+  <summary>
+    <band height="50">
+      <rectangle><reportElement x="0" y="0" width="782" height="28" backcolor="#1e293b" forecolor="#1e293b"/><graphicElement><pen lineWidth="0"/></graphicElement></rectangle>
+      <staticText><reportElement x="6" y="10" width="310" height="8" forecolor="#FFFFFF"/><textElement><font isBold="true"/></textElement><text><![CDATA[TOTAIS]]></text></staticText>
+      <textField><reportElement x="452" y="10" width="73" height="8" forecolor="#FFFFFF"/><textElement textAlignment="Right"><font isBold="true" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_GROSS}]]></textFieldExpression></textField>
+      <textField><reportElement x="527" y="10" width="58" height="8" forecolor="#f87171"/><textElement textAlignment="Right"><font isBold="true" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_INSS_EMP}]]></textFieldExpression></textField>
+      <textField><reportElement x="587" y="10" width="58" height="8" forecolor="#f87171"/><textElement textAlignment="Right"><font isBold="true" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_IRT}]]></textFieldExpression></textField>
+      <textField><reportElement x="647" y="10" width="58" height="8" forecolor="#f87171"/><textElement textAlignment="Right"><font isBold="true" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_DED}]]></textFieldExpression></textField>
+      <textField><reportElement x="707" y="10" width="73" height="8" forecolor="#4ade80"/><textElement textAlignment="Right"><font isBold="true" size="9" fontName="DejaVu Sans Mono"/></textElement><textFieldExpression><![CDATA[$P{TOTAL_NET}]]></textFieldExpression></textField>
+
+      <!-- Linha INSS Empregador -->
+      <textField><reportElement x="0" y="36" width="782" height="10" forecolor="#9ca3af"/><textElement textAlignment="Right"/><textFieldExpression><![CDATA["Encargo INSS Entidade Empregadora (8%): " + $P{TOTAL_INSS_EMP2} + "  (custo adicional da empresa, não deduzido ao colaborador)"]]></textFieldExpression></textField>
+    </band>
+  </summary>
+
+</jasperReport>

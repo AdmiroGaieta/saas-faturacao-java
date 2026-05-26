@@ -6,6 +6,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.HtmlExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.*;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;

@@ -1,10 +1,11 @@
 package ao.saas.faturacao.modules.audit.entity;
 
 import ao.saas.faturacao.common.enums.AuditAction;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "audit_logs")
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@TypeDef(name = "jsonb", typeClass = JsonNodeType.class)
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class AuditLog {
 

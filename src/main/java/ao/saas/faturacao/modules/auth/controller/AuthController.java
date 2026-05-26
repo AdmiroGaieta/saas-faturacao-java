@@ -1,7 +1,12 @@
 package ao.saas.faturacao.modules.auth.controller;
 
 import ao.saas.faturacao.common.response.ApiResponse;
-import ao.saas.faturacao.modules.auth.dto.AuthDTOs.*;
+import ao.saas.faturacao.modules.auth.dto.AuthResponse;
+import ao.saas.faturacao.modules.auth.dto.ChangePasswordRequest;
+import ao.saas.faturacao.modules.auth.dto.LoginRequest;
+import ao.saas.faturacao.modules.auth.dto.RefreshTokenRequest;
+import ao.saas.faturacao.modules.auth.dto.RegisterRequest;
+import ao.saas.faturacao.modules.auth.dto.UserDTO;
 import ao.saas.faturacao.modules.auth.service.AuthService;
 import ao.saas.faturacao.modules.users.entity.User;
 import ao.saas.faturacao.modules.users.repository.UserRepository;
