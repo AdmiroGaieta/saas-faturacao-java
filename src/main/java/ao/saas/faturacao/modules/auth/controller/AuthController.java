@@ -44,11 +44,17 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(authService.login(dto)));
     }
 
-    @PostMapping("/refresh")
-    @Operation(summary = "Renovar access token")
-    public ResponseEntity<ApiResponse<AuthResponse>> refresh(@Valid @RequestBody RefreshTokenRequest dto) {
-        return ResponseEntity.ok(ApiResponse.ok(authService.refresh(dto.getRefreshToken())));
-    }
+    /*
+     * @PostMapping("/refresh")
+     * 
+     * @Operation(summary = "Renovar access token")
+     * public ResponseEntity<ApiResponse<AuthResponse>> refresh(@Valid @RequestBody
+     * RefreshTokenRequest dto) {
+     * return
+     * ResponseEntity.ok(ApiResponse.ok(authService.refresh(dto.getRefreshToken())))
+     * ;
+     * }
+     */
 
     @PostMapping("/change-password")
     @Operation(summary = "Alterar password")
@@ -65,7 +71,8 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserDTO>> me(@AuthenticationPrincipal UserDetails principal) {
         UUID userId = UUID.fromString(principal.getUsername());
         User user = userRepo.findByIdAndDeletedAtIsNull(userId)
-                .orElseThrow(() -> ao.saas.faturacao.common.exceptions.BusinessException.notFound("Utilizador não encontrado"));
+                .orElseThrow(() -> ao.saas.faturacao.common.exceptions.BusinessException
+                        .notFound("Utilizador não encontrado"));
         return ResponseEntity.ok(ApiResponse.ok(UserDTO.from(user)));
     }
 }

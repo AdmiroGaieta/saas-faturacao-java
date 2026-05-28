@@ -8,9 +8,9 @@ public class BusinessException extends RuntimeException {
 
     private final HttpStatus status;
 
-    public BusinessException(String message, HttpStatus status) {
+    public BusinessException(String message, HttpStatus unauthorized) {
         super(message);
-        this.status = status;
+        this.status = null;
     }
 
     public static BusinessException notFound(String message) {

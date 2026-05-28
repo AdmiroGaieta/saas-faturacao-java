@@ -72,14 +72,17 @@ CREATE TABLE users (
     last_name         VARCHAR(100) NOT NULL,
     phone             VARCHAR(30),
     avatar            VARCHAR(500),
-    role              user_role NOT NULL DEFAULT 'ADMIN',
-    status            user_status NOT NULL DEFAULT 'PENDING_VERIFICATION',
+    role              VARCHAR(50) NOT NULL DEFAULT 'ADMIN',
+    status            VARCHAR(50) NOT NULL DEFAULT 'PENDING_VERIFICATION',
     email_verified_at TIMESTAMP,
     last_login_at     TIMESTAMP,
     refresh_token     TEXT,
     created_at        TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at        TIMESTAMP NOT NULL DEFAULT NOW(),
-    deleted_at        TIMESTAMP
+    deleted_at        TIMESTAMP,
+    
+    CONSTRAINT chk_user_role CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'VIEWER')),
+    CONSTRAINT chk_user_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION'))
 );
 
 CREATE TABLE companies (
@@ -87,9 +90,9 @@ CREATE TABLE companies (
     name                  VARCHAR(255) NOT NULL,
     trade_name            VARCHAR(255),
     nif                   VARCHAR(20) NOT NULL UNIQUE,
-    type                  company_type NOT NULL DEFAULT 'LDA',
-    tax_regime            tax_regime NOT NULL DEFAULT 'GENERAL',
-    status                company_status NOT NULL DEFAULT 'TRIAL',
+    type                  VARCHAR(50) NOT NULL DEFAULT 'LDA',
+    tax_regime            VARCHAR(50) NOT NULL DEFAULT 'GENERAL',
+    status                VARCHAR(50) NOT NULL DEFAULT 'TRIAL',
     address               VARCHAR(500),
     city                  VARCHAR(100),
     province              VARCHAR(100),
@@ -102,11 +105,11 @@ CREATE TABLE companies (
     bank_name             VARCHAR(100),
     bank_account          VARCHAR(100),
     bank_iban             VARCHAR(50),
-    invoice_prefix        VARCHAR(5) NOT NULL DEFAULT 'FT',
+    invoice_prefix      VARCHAR(20) NOT NULL DEFAULT 'FT',
     invoice_next_number   INTEGER NOT NULL DEFAULT 1,
-    invoice_series        VARCHAR(5) NOT NULL DEFAULT 'A',
+    invoice_series      VARCHAR(20) NOT NULL DEFAULT 'A',
     default_due_days      INTEGER NOT NULL DEFAULT 30,
-    default_currency      VARCHAR(5) NOT NULL DEFAULT 'AOA',
+    default_currency    VARCHAR(10) NOT NULL DEFAULT 'AOA',
     default_notes         TEXT,
     terms_conditions      TEXT,
     logo                  VARCHAR(500),
@@ -114,18 +117,24 @@ CREATE TABLE companies (
     agt_registered        BOOLEAN NOT NULL DEFAULT FALSE,
     created_at            TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at            TIMESTAMP NOT NULL DEFAULT NOW(),
-    deleted_at            TIMESTAMP
+    deleted_at            TIMESTAMP,
+
+    CONSTRAINT chk_company_type CHECK (type IN ('INDIVIDUAL', 'LDA', 'SA', 'UNIPESSOAL', 'OTHER')),
+    CONSTRAINT chk_company_tax_regime CHECK (tax_regime IN ('SIMPLIFIED', 'GENERAL', 'EXEMPT')),
+    CONSTRAINT chk_company_status CHECK (status IN ('ACTIVE', 'INACTIVE', 'SUSPENDED', 'TRIAL'))
 );
 
 CREATE TABLE company_users (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     company_id  UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    role        user_role NOT NULL DEFAULT 'VIEWER',
+    role        VARCHAR(50) NOT NULL DEFAULT 'VIEWER',
     is_default  BOOLEAN NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-    UNIQUE (user_id, company_id)
+    UNIQUE (user_id, company_id),
+
+    CONSTRAINT chk_company_user_role CHECK (role IN ('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTANT', 'VIEWER'))
 );
 
 CREATE TABLE tax_rates (
@@ -142,7 +151,7 @@ CREATE TABLE tax_rates (
 CREATE TABLE customers (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id      UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-    type            customer_type NOT NULL DEFAULT 'COMPANY',
+    type            VARCHAR(50) NOT NULL DEFAULT 'COMPANY',
     first_name      VARCHAR(100),
     last_name       VARCHAR(100),
     company_name    VARCHAR(255),
@@ -163,8 +172,11 @@ CREATE TABLE customers (
     is_active       BOOLEAN NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
-    deleted_at      TIMESTAMP
+    deleted_at      TIMESTAMP,
+
+    CONSTRAINT chk_customer_type CHECK (type IN ('INDIVIDUAL', 'COMPANY'))
 );
+
 
 CREATE TABLE products (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -173,8 +185,8 @@ CREATE TABLE products (
     code            VARCHAR(50),
     name            VARCHAR(255) NOT NULL,
     description     TEXT,
-    type            product_type NOT NULL DEFAULT 'SERVICE',
-    unit            product_unit NOT NULL DEFAULT 'UNIT',
+    type            VARCHAR(50) NOT NULL DEFAULT 'SERVICE',
+    unit            VARCHAR(50) NOT NULL DEFAULT 'UNIT',
     price           NUMERIC(15,2) NOT NULL,
     currency        VARCHAR(5) NOT NULL DEFAULT 'AOA',
     manage_stock    BOOLEAN NOT NULL DEFAULT FALSE,
@@ -184,18 +196,21 @@ CREATE TABLE products (
     notes           TEXT,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
-    deleted_at      TIMESTAMP
+    deleted_at      TIMESTAMP,
+
+    CONSTRAINT chk_product_type CHECK (type IN ('PRODUCT', 'SERVICE')),
+    CONSTRAINT chk_product_unit CHECK (unit IN ('UNIT', 'KG', 'LITER', 'METER', 'M2', 'M3', 'HOUR', 'DAY', 'MONTH', 'YEAR'))
 );
 
 CREATE TABLE invoices (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id          UUID NOT NULL REFERENCES companies(id),
     customer_id         UUID NOT NULL REFERENCES customers(id),
-    type                invoice_type NOT NULL DEFAULT 'INVOICE',
+    type                VARCHAR(50) NOT NULL DEFAULT 'INVOICE',
     series              VARCHAR(5) NOT NULL,
     number              INTEGER NOT NULL,
     full_number         VARCHAR(50) NOT NULL UNIQUE,
-    status              invoice_status NOT NULL DEFAULT 'DRAFT',
+    status              VARCHAR(50) NOT NULL DEFAULT 'DRAFT',
     issue_date          DATE NOT NULL DEFAULT CURRENT_DATE,
     due_date            DATE,
     paid_at             TIMESTAMP,
@@ -231,7 +246,7 @@ CREATE TABLE invoice_items (
     tax_rate_id     UUID REFERENCES tax_rates(id),
     description     VARCHAR(500) NOT NULL,
     quantity        NUMERIC(10,2) NOT NULL,
-    unit            product_unit NOT NULL DEFAULT 'UNIT',
+    unit            VARCHAR(50) NOT NULL DEFAULT 'UNIT',
     unit_price      NUMERIC(15,2) NOT NULL,
     discount_pct    NUMERIC(5,2) NOT NULL DEFAULT 0,
     discount_amt    NUMERIC(15,2) NOT NULL DEFAULT 0,
@@ -241,7 +256,9 @@ CREATE TABLE invoice_items (
     total           NUMERIC(15,2) NOT NULL,
     sort_order      INTEGER NOT NULL DEFAULT 0,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_invoice_item_unit CHECK (unit IN ('UNIT', 'KG', 'LITER', 'METER', 'M2', 'M3', 'HOUR', 'DAY', 'MONTH', 'YEAR'))
 );
 
 CREATE TABLE payments (
@@ -249,19 +266,21 @@ CREATE TABLE payments (
     invoice_id  UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
     amount      NUMERIC(15,2) NOT NULL,
     currency    VARCHAR(5) NOT NULL DEFAULT 'AOA',
-    method      payment_method NOT NULL DEFAULT 'BANK_TRANSFER',
+    method      VARCHAR(50) NOT NULL DEFAULT 'BANK_TRANSFER',
     paid_at     TIMESTAMP NOT NULL DEFAULT NOW(),
     reference   VARCHAR(100),
     notes       TEXT,
     created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_payment_method CHECK (method IN ('CASH', 'BANK_TRANSFER', 'CHECK', 'MULTICAIXA', 'CREDIT_CARD', 'DEBIT_CARD', 'OTHER'))
 );
 
 CREATE TABLE subscriptions (
     id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id            UUID NOT NULL UNIQUE REFERENCES companies(id) ON DELETE CASCADE,
-    plan                  subscription_plan NOT NULL DEFAULT 'FREE',
-    status                subscription_status NOT NULL DEFAULT 'TRIALING',
+    plan                  VARCHAR(50) NOT NULL DEFAULT 'FREE',
+    status                VARCHAR(50) NOT NULL DEFAULT 'TRIALING',
     trial_ends_at         TIMESTAMP,
     current_period_start  TIMESTAMP,
     current_period_end    TIMESTAMP,
@@ -273,21 +292,26 @@ CREATE TABLE subscriptions (
     invoices_this_month   INTEGER NOT NULL DEFAULT 0,
     external_id           VARCHAR(100),
     created_at            TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at            TIMESTAMP NOT NULL DEFAULT NOW()
+    updated_at            TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_subscription_plan CHECK (plan IN ('FREE', 'STARTER', 'PROFESSIONAL', 'ENTERPRISE')),
+    CONSTRAINT chk_subscription_status CHECK (status IN ('ACTIVE', 'TRIALING', 'PAST_DUE', 'CANCELLED', 'EXPIRED'))
 );
 
 CREATE TABLE audit_logs (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     company_id  UUID REFERENCES companies(id),
     user_id     UUID REFERENCES users(id),
-    action      audit_action NOT NULL,
+    action      VARCHAR(50) NOT NULL,
     entity      VARCHAR(100) NOT NULL,
     entity_id   UUID,
     old_values  JSONB,
     new_values  JSONB,
     ip_address  VARCHAR(50),
     user_agent  TEXT,
-    created_at  TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT chk_audit_action CHECK (action IN ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'EXPORT', 'CANCEL', 'SEND', 'PAY'))
 );
 
 -- ── ÍNDICES ───────────────────────────────────────────────────

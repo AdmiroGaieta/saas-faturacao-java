@@ -14,7 +14,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
@@ -37,12 +41,14 @@ public class User extends BaseEntity {
     private String avatar;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "user_role")
-    private UserRole role = UserRole.ADMIN;
+    @org.hibernate.annotations.Type(type = "org.hibernate.type.EnumType")
+    @Column(name = "role", columnDefinition = "user_role")
+    private UserRole role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "user_status")
-    private UserStatus status = UserStatus.PENDING_VERIFICATION;
+    @org.hibernate.annotations.Type(type = "org.hibernate.type.EnumType")
+    @Column(name = "status", columnDefinition = "user_status")
+    private UserStatus status;
 
     @Column(name = "email_verified_at")
     private LocalDateTime emailVerifiedAt;

@@ -12,21 +12,24 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "subscriptions")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Subscription extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false, unique = true)
-    @JsonIgnore
+    @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = false, insertable = true, updatable = true)
     private Company company;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "subscription_plan")
-    private SubscriptionPlan plan = SubscriptionPlan.FREE;
+    @Column(name = "plan", length = 50)
+    private SubscriptionPlan plan;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "subscription_status")
-    private SubscriptionStatus status = SubscriptionStatus.TRIALING;
+    @Column(name = "status", length = 50)
+    private SubscriptionStatus status;
 
     @Column(name = "trial_ends_at")
     private LocalDateTime trialEndsAt;

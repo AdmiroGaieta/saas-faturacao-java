@@ -15,7 +15,11 @@ import java.util.UUID;
 @Entity
 @Table(name = "audit_logs")
 @TypeDef(name = "jsonb", typeClass = JsonNodeType.class)
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AuditLog {
 
     @Id
@@ -55,4 +59,5 @@ public class AuditLog {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
 }

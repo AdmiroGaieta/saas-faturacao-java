@@ -2,10 +2,12 @@ package ao.saas.faturacao.modules.companies.entity;
 
 import ao.saas.faturacao.common.BaseEntity;
 import ao.saas.faturacao.common.enums.*;
+import ao.saas.faturacao.modules.companies.entity.CompanyUser;
 import ao.saas.faturacao.modules.subscriptions.entity.Subscription;
 import ao.saas.faturacao.modules.taxrates.entity.TaxRate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,8 +16,14 @@ import java.util.List;
 
 @Entity
 @Table(name = "companies")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Company extends BaseEntity {
+
+    // ✔ REMOVIDO: O campo ID duplicado foi retirado para respeitar a herança de
+    // BaseEntity
 
     @Column(nullable = false)
     private String name;
@@ -27,16 +35,16 @@ public class Company extends BaseEntity {
     private String nif;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "company_type")
-    private CompanyType type = CompanyType.LDA;
+    @Column(nullable = false)
+    private CompanyType type;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tax_regime", nullable = false, columnDefinition = "tax_regime")
-    private TaxRegime taxRegime = TaxRegime.GENERAL;
+    @Column(name = "tax_regime", nullable = false)
+    private TaxRegime taxRegime;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "company_status")
-    private CompanyStatus status = CompanyStatus.TRIAL;
+    @Column(nullable = false)
+    private CompanyStatus status;
 
     @Column(length = 500)
     private String address;
@@ -120,4 +128,13 @@ public class Company extends BaseEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<TaxRate> taxRates = new ArrayList<>();
+
+    // ✔ ADICIONADO: Método helper para garantir o vínculo mútuo dos objetos em
+    // memória
+    public void linkSubscription(Subscription sub) {
+        this.subscription = sub;
+        if (sub != null) {
+            sub.setCompany(this);
+        }
+    }
 }

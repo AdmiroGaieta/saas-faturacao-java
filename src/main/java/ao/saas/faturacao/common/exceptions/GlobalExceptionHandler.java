@@ -25,7 +25,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException e) {
-        return build(e.getStatus(), e.getMessage());
+        // CORREÇÃO: Valida se o status é nulo. Se for, assume BAD_REQUEST (400)
+        HttpStatus status = e.getStatus() != null ? e.getStatus() : HttpStatus.BAD_REQUEST;
+        return build(status, e.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -86,11 +88,10 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ApiResponse<Void>> build(HttpStatus status, String message) {
         return ResponseEntity.status(status).body(
-            ApiResponse.<Void>builder()
-                .success(false)
-                .statusCode(status.value())
-                .message(message)
-                .build()
-        );
+                ApiResponse.<Void>builder()
+                        .success(false)
+                        .statusCode(status.value())
+                        .message(message)
+                        .build());
     }
 }

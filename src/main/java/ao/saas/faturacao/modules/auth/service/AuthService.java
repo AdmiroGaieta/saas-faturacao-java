@@ -14,6 +14,8 @@ import ao.saas.faturacao.modules.users.repository.UserRepository;
 import ao.saas.faturacao.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -65,17 +67,31 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest dto) {
-        // Spring Security valida as credenciais
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
 
         User user = userRepo.findByEmailAndDeletedAtIsNull(dto.getEmail())
-                .orElseThrow(() -> BusinessException.notFound("Utilizador não encontrado"));
+                .orElseThrow(() -> new BusinessException("Utilizador não encontrado", HttpStatus.NOT_FOUND));
+
+        log.info("Login tentativa para email: {}", dto.getEmail());
+        log.info("Hash na BD: {}", user.getPassword());
+
+        boolean passwordMatches = passwordEncoder.matches(dto.getPassword(), user.getPassword());
+
+        log.info("Password bate? {}", passwordMatches);
+
+        if (!passwordMatches) {
+            log.warn("Password inválida para email: {}", dto.getEmail());
+            throw new org.springframework.security.authentication.BadCredentialsException(
+                    "Email ou password incorrectos");
+        }
+
+        authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword()));
 
         user.setLastLoginAt(LocalDateTime.now());
         userRepo.save(user);
 
         List<CompanyUser> companyUsers = companyUserRepo.findByUserId(user.getId());
+
         List<CompanyInfo> companies = companyUsers.stream()
                 .map(cu -> CompanyInfo.builder()
                         .id(cu.getCompany().getId())
@@ -87,38 +103,6 @@ public class AuthService {
 
         return buildAuthResponse(user, companies);
     }
-
-    // ── Refresh Token ─────────────────────────────────────────
-
-    @Transactional
-    public AuthResponse refresh(String refreshToken) {
-        try {
-            var userId = jwtService.extractUserId(refreshToken);
-            User user = userRepo.findByIdAndDeletedAtIsNull(userId)
-                    .orElseThrow(() -> BusinessException.notFound("Utilizador não encontrado"));
-
-            if (jwtService.isTokenExpired(refreshToken)) {
-                throw BusinessException.badRequest("Refresh token expirado");
-            }
-
-            List<CompanyUser> companyUsers = companyUserRepo.findByUserId(user.getId());
-            List<CompanyInfo> companies = companyUsers.stream()
-                    .map(cu -> CompanyInfo.builder()
-                            .id(cu.getCompany().getId())
-                            .name(cu.getCompany().getName())
-                            .role(cu.getRole())
-                            .isDefault(cu.getIsDefault())
-                            .build())
-                    .collect(Collectors.toList());
-
-            return buildAuthResponse(user, companies);
-        } catch (BusinessException e) {
-            throw e;
-        } catch (Exception e) {
-            throw BusinessException.badRequest("Token de refresh inválido");
-        }
-    }
-
     // ── Change Password ───────────────────────────────────────
 
     @Transactional
@@ -137,7 +121,7 @@ public class AuthService {
     // ── Helpers ───────────────────────────────────────────────
 
     private AuthResponse buildAuthResponse(User user, List<CompanyInfo> companies) {
-        String accessToken  = jwtService.generateAccessToken(user);
+        String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
         return AuthResponse.builder()
