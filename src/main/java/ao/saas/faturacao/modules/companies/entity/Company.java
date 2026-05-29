@@ -118,23 +118,18 @@ public class Company extends BaseEntity {
 
     // ── Relações ──────────────────────────────────────────────
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private List<CompanyUser> companyUsers = new ArrayList<>();
 
-    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private Subscription subscription;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<TaxRate> taxRates = new ArrayList<>();
 
-    // ✔ ADICIONADO: Método helper para garantir o vínculo mútuo dos objetos em
-    // memória
     public void linkSubscription(Subscription sub) {
         this.subscription = sub;
-        if (sub != null) {
-            sub.setCompany(this);
-        }
+        sub.setCompany(this);
     }
 }

@@ -56,67 +56,42 @@ public class CompanyService {
         @Transactional
         public Company create(UUID userId, Company dto) {
 
-                if (companyRepo.existsByNif(dto.getNif())) {
-                        throw BusinessException.conflict("Já existe uma empresa com este NIF");
-                }
-
                 User user = userRepo.findByIdAndDeletedAtIsNull(userId)
                                 .orElseThrow(() -> BusinessException.notFound("Utilizador não encontrado"));
 
-                dto.setStatus(CompanyStatus.TRIAL);
+                // 1. Criar empresa limpa (NUNCA usar DTO direto como entity persistida)
+                Company company = new Company();
+                company.setName(dto.getName());
+                company.setNif(dto.getNif());
+                company.setType(dto.getType());
+                company.setTaxRegime(dto.getTaxRegime());
+                company.setStatus(CompanyStatus.TRIAL);
 
-                log.info("[COMPANY-CREATE] 1. A guardar a empresa: {}", dto.getName());
+                company = companyRepo.save(company);
 
-                // Salva a empresa e limpa o cascade temporário desvinculando relações inline
-                Company company = companyRepo.save(dto);
-
-                log.info("[COMPANY-CREATE] 2. Empresa guardada fisicamente. ID gerado: {}", company.getId());
-
-                // Criar a relação utilizador-empresa
+                // 2. CompanyUser
                 CompanyUser cu = CompanyUser.builder()
                                 .user(user)
                                 .company(company)
                                 .role(UserRole.ADMIN)
                                 .isDefault(true)
                                 .build();
-                companyUserRepo.saveAndFlush(cu);
 
-                log.info("[COMPANY-CREATE] 3. Relação CompanyUser criada para a empresa.");
+                companyUserRepo.save(cu);
 
-                // Montar a subscrição completa
-                Subscription sub = Subscription.builder()
-                                .plan(SubscriptionPlan.FREE)
-                                .status(SubscriptionStatus.TRIALING)
-                                .trialEndsAt(LocalDateTime.now().plusDays(14))
-                                .currentPeriodStart(LocalDateTime.now())
-                                .currentPeriodEnd(LocalDateTime.now().plusDays(14))
-                                .invoicesThisMonth(0)
-                                .maxUsers(2)
-                                .maxInvoices(10)
-                                .maxCustomers(50)
-                                .maxProducts(100)
-                                .externalId("SUB-" + company.getNif())
-                                .build();
-
-                // Força a injeção do objeto de forma isolada via setter antes do flush
+                // 3. Subscription (FK já garantida)
+                Subscription sub = new Subscription();
                 sub.setCompany(company);
+                sub.setPlan(SubscriptionPlan.FREE);
+                sub.setStatus(SubscriptionStatus.TRIALING);
+                sub.setTrialEndsAt(LocalDateTime.now().plusDays(14));
+                sub.setCurrentPeriodStart(LocalDateTime.now());
+                sub.setCurrentPeriodEnd(LocalDateTime.now().plusDays(14));
+                sub.setExternalId("SUB-" + company.getNif());
 
-                log.info("[COMPANY-CREATE] 4. A tentar persistir a subscrição isolada no Banco...");
+                company.linkSubscription(sub);
 
-                // Salva a subscrição de forma isolada forcando a gravação
-                subscriptionRepo.saveAndFlush(sub);
-
-                // Sincroniza o lado da empresa apenas na memória para o retorno da API
-                company.setSubscription(sub);
-
-                log.info("[COMPANY-CREATE] 5. Todo o ecossistema guardado. A gerar Log de Auditoria.");
-
-                auditService.log(
-                                company.getId(),
-                                userId,
-                                AuditAction.CREATE,
-                                "Company",
-                                company.getId());
+                subscriptionRepo.save(sub);
 
                 return company;
         }
